@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Application</title>
+    <script>
+        async function submitQuery() {
+            const query = document.getElementById('query').value;
+            const response = await fetch('/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query })
+            });
+
+            const data = await response.json();
+            const resultsContainer = document.getElementById('results');
+            
+            resultsContainer.innerHTML = '';  // Clear previous results
+
+            if (data.error) {
+                resultsContainer.innerHTML = `<p>Error: ${data.error}</p>`;
+            } else if (data.message) {
+                resultsContainer.innerHTML = `<p>${data.message}</p>`;
+            } else {
+                data.forEach(course => {
+                    const courseElement = document.createElement('div');
+                    courseElement.innerHTML = `<h3>${course.title}</h3><p>${course.description}</p>`;
+                    resultsContainer.appendChild(courseElement);
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <form onsubmit="event.preventDefault(); submitQuery();">
+        <input type="text" id="query" name="query" required placeholder="Enter your query">
+        <button type="submit">Submit</button>
+    </form>
+    <div id="results"></div>
+</body>
+</html>
